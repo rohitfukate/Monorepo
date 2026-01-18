@@ -1,0 +1,38 @@
+#!/bin/bash
+# Usage: ./create_github_monorepo.sh <github-username> <repo-name>
+# Example: ./create_github_monorepo.sh rohitfukate inventory-management-system
+
+USERNAME=$1
+REPO_NAME=$2
+
+if [ -z "$USERNAME" ] || [ -z "$REPO_NAME" ]; then
+  echo "Error: Provide your GitHub username and desired repo name."
+  echo "Usage: ./create_github_monorepo.sh <username> <repo-name>"
+  exit 1
+fi
+
+# Check if GitHub CLI is installed
+if ! command -v gh &> /dev/null
+then
+    echo "GitHub CLI not found. Install from https://cli.github.com/"
+    exit 1
+fi
+
+# Navigate to project root
+cd inventory-management-system || { echo "inventory-management-system folder not found"; exit 1; }
+
+# Initialize git
+git init
+git add .
+git commit -m "Initial commit for monorepo"
+git branch -M main
+
+# Create public repo on GitHub
+gh repo create $USERNAME/$REPO_NAME --public --confirm
+
+# Add remote and push
+git remote add origin https://github.com/$USERNAME/$REPO_NAME.git
+git push -u origin main
+
+echo "✅ Monorepo created and pushed!"
+echo "Repo link: https://github.com/$USERNAME/$REPO_NAME"
